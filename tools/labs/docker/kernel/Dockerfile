@@ -36,15 +36,16 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ARG ARG_UID
 ARG ARG_GID
+ARG ARG_USER
 
-RUN groupadd -g $ARG_GID ubuntu
-RUN useradd -u $ARG_UID -g $ARG_GID -ms /bin/bash ubuntu && adduser ubuntu sudo && echo -n 'ubuntu:ubuntu' | chpasswd
+RUN groupadd -g $ARG_GID $ARG_USER
+RUN useradd -u $ARG_UID -g $ARG_GID -ms /bin/bash $ARG_USER && adduser $ARG_USER sudo && printf $ARG_USER:$ARG_USER | chpasswd
 
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i.bkp -e \
       's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
       /etc/sudoers
 
-USER ubuntu
-WORKDIR /home/ubuntu/
+USER $ARG_USER
+WORKDIR /home/$ARG_USER/
 RUN echo add-auto-load-safe-path /linux/scripts/gdb/vmlinux-gdb.py > ~/.gdbinit

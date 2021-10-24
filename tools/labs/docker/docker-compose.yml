@@ -22,15 +22,16 @@ services:
   kernel-build:
     privileged: true
     tty: true
-    hostname: "so2"
+    hostname: "lkl"
     environment:
       - DISPLAY
     build:
       context: .
       dockerfile: ./kernel/Dockerfile
       args:
+              ARG_USER: ${ARG_USER}
               ARG_UID: ${ARG_UID}
               ARG_GID: ${ARG_GID}
     volumes:
-      - ../../../:/linux
+      - ../../../:/home/${ARG_USER}/linux/
       - /tmp/.X11-unix:/tmp/.X11-unix
