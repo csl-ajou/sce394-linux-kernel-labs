@@ -14,7 +14,7 @@ depsdir=${basedir}/deps
 samplesdir=${basedir}/samples
 busyboxdir=${depsdir}/busybox
 
-hostname=wintermute
+hostname=sce394_vm
 rootfs_size=4096m
 memory=512m
 
@@ -34,4 +34,4 @@ wait_for_gdb_at_boot=n
 qemu_debug_args="-s -S"
 
 # Packages to install on rootfs
-packages_to_install="bpftrace bpfcc-tools gdb"
+packages_to_install="vim tmux sudo bpftrace bpfcc-tools gdb"

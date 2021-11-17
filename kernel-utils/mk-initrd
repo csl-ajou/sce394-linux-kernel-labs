@@ -37,7 +37,7 @@ if [ ! -e ${busyboxdir} ]; then
   mkdir -p ${busyboxdir}
   (
     cd ${depsdir}
-    git clone git@github.com:mirror/busybox.git 2>&1 | tee -a ${basedir}/log
+    git clone https://github.com/mirror/busybox.git 2>&1 | tee -a ${basedir}/log
   )
 fi
 cp ${confdir}/busybox.config ${busyboxdir}/.config

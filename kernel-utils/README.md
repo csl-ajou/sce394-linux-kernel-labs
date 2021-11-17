@@ -7,7 +7,8 @@ This is a set of scripts and utilities to ease kernel development and testing in
 Kernel build dependencies:
 
 ```
-$ sudo apt-get install e2fsprogs build-essential linux-source bc kmod cpio flex cpio libncurses5-dev
+$ sudo apt-get update
+$ sudo apt-get install e2fsprogs build-essential bc kmod cpio flex libncurses5-dev libelf-dev # linux-source
 ```
 
 Other dependencies:
@@ -16,6 +17,11 @@ Other dependencies:
 * qemu-system-x86 (for now)
 * ccache
 * clang (optional)
+
+```
+$ sudo apt-get update
+$ sudo apt-get install debootstrap qemu ccache
+```
 
 ## Step 1: Create an initrd image
 ```
@@ -35,8 +41,9 @@ $ ./mk-rootfs
 ```
 $ mkdir src
 $ cd src
-$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-$ cd linux
+$ wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.2.tar.xz
+$ tar xvf linux-5.15.2.tar.xz
+$ cd linux-5.15.2
 $ make defconfig
 $ make -j$(nproc)
 $ cd ../../
@@ -47,7 +54,7 @@ $ cd ../../
 To boot the kernel created in Step 3:
 
 ```
-$ ./boot.sh linux
+$ ./boot.sh linux-5.15.2
 ```
 
 The argument to the script is the directory under src/ which holds the kernel. Multiple trees

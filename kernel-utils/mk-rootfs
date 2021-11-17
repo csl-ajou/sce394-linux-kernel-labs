@@ -44,8 +44,9 @@ echo -n "Setting hostname: ${hostname}... "
 sudo sh -c "echo '${hostname}' > ${rootfs}/etc/hostname"
 echo "ok"
 
-echo "Set the root password... "
-sudo sh -c "chroot ${rootfs} passwd root"
+# Since we execute kernel in docker container, we don't have to set root password
+#echo "Set the root password... "
+#sudo sh -c "chroot ${rootfs} passwd root"
 
 echo "Enabling networking... "
 sudo cp ${confdir}/dhcp.network ${rootfs}/etc/systemd/network/
