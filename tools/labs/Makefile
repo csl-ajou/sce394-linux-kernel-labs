@@ -5,8 +5,6 @@ MODS = $(shell cd templates && find $(LABS) -mindepth 1 -name Kbuild | xargs dir
 TODO ?= 0
 USER = $(shell whoami)
 
-include qemu/Makefile
-
 skels:
 	mkdir -p skels
 	cd templates && find $(LABS) -type f | xargs ./generate_skels.py --output ../skels --todo $(TODO)
@@ -32,35 +30,11 @@ copy: $(YOCTO_IMAGE)
 	sudo umount $(TEMPDIR)
 	rmdir $(TEMPDIR)
 
-docker-docs:
-	cd docker && docker-compose build docs-build
-	cd docker && docker-compose up -d docs-build
-	cd docker && docker-compose exec -u ubuntu docs-build bash -c "cd /linux/tools/labs && make docs"
-
-docker-docs-server:
-	cd docker && docker-compose build docs-server
-	cd docker && docker-compose up -d docs-server
-
-docker-kernel:
-	cd docker && ARG_UID=$(shell id -u) ARG_GID=$(shell id -g) ARG_USER=$(USER) docker-compose -p $(USER) build kernel-build
-	cd docker && ARG_UID=$(shell id -u) ARG_GID=$(shell id -g) ARG_USER=$(USER) docker-compose -p $(USER) up -d kernel-build
-	cd docker && ARG_UID=$(shell id -u) ARG_GID=$(shell id -g) ARG_USER=$(USER) docker-compose -p $(USER) exec -u $(USER) kernel-build bash
-
-stop-docker-kernel:
-	cd docker && docker-compose down
-
-docs:
-	$(MAKE) -C $(KDIR) DOCBOOKS= SPHINXDIRS="teaching" htmldocs
-	$(MAKE) -C $(KDIR) BUILDDIR=$(KDIR)/Documentation/output/slides DOCBOOKS= SPHINXDIRS="teaching" slides
-	for i in $(KDIR)/Documentation/output/slides/teaching/lectures/*.html; do name=$$(basename $$i .html); cp $$i $(KDIR)/Documentation/output/teaching/lectures/$$name-slides.html; done
-	for i in $(KDIR)/Documentation/output/slides/teaching/so2/lec*.html; do name=$$(basename $$i .html); cp $$i $(KDIR)/Documentation/output/teaching/so2/$$name-slides.html; done
-	cp -r $(KDIR)/Documentation/output/slides/teaching/_static $(KDIR)/Documentation/output/teaching/
-
 clean::
 	$(MAKE) -C $(KDIR) M=$(KDIR)/tools/labs/skels ARCH=$(ARCH) clean
 	for i in $(shell find skels -name Makefile | xargs --no-run-if-empty dirname); do $(MAKE) -C $$i clean; done
 
 clean_skels:
-	rm -rfi skels
+	rm -rf skels
 
-.PHONY: skels build copy docs docker-docs docker-kernel stop-docker-kernel clean clean_skels
+.PHONY: skels build copy clean clean_skels
