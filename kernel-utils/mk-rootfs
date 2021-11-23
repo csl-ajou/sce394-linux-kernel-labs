@@ -19,7 +19,7 @@ check_availability_of() {
 check_availability_of qemu-img
 check_availability_of /sbin/mkfs.ext4
 check_availability_of sudo
-check_availability_of /sbin/debootstrap
+check_availability_of /usr/sbin/debootstrap
 
 echo -n "Removing existing ${rootfs}, press ENTER to proceed... "
 read input
@@ -37,16 +37,25 @@ sudo mount -o loop ${basedir}/rootfs.img ${rootfs}
 echo "ok"
 
 echo -n "Bootstrapping filesystem... "
-sudo /sbin/debootstrap unstable ${rootfs} http://deb.debian.org/debian/ 2>&1 | tee -a ${basedir}/log
+sudo /usr/sbin/debootstrap unstable ${rootfs} http://deb.debian.org/debian/ 2>&1 | tee -a ${basedir}/log
 echo "ok"
 
 echo -n "Setting hostname: ${hostname}... "
 sudo sh -c "echo '${hostname}' > ${rootfs}/etc/hostname"
 echo "ok"
 
-# Since we execute kernel in docker container, we don't have to set root password
-#echo "Set the root password... "
-#sudo sh -c "chroot ${rootfs} passwd root"
+echo "Intalling sudo... "
+sudo sh -c "chroot ${rootfs} apt-get update"
+sudo sh -c "chroot ${rootfs} apt-get install -y sudo"
+
+echo "Add the user... "
+sudo sh -c "chroot ${rootfs} adduser $(whoami)"
+
+echo "Add the user to sudo group... "
+sudo sh -c "chroot ${rootfs} adduser $(whoami) sudo"
+
+# echo "Set the root password... "
+# sudo sh -c "chroot ${rootfs} passwd $(whoami)"
 
 echo "Enabling networking... "
 sudo cp ${confdir}/dhcp.network ${rootfs}/etc/systemd/network/
@@ -55,7 +64,7 @@ sudo sh -c "chroot ${rootfs} systemctl enable systemd-resolved.service"
 
 if test ! -z "${packages_to_install}"; then
   echo "Installing additional packages... "
-  sudo sh -c "chroot ${rootfs} apt-get update"
+#  sudo sh -c "chroot ${rootfs} apt-get update"
   sudo sh -c "chroot ${rootfs} apt-get install -y ${packages_to_install}"
 fi
 

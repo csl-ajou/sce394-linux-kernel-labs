@@ -54,7 +54,7 @@ $ cd ../../
 To boot the kernel created in Step 3:
 
 ```
-$ ./boot.sh linux-5.15.2
+$ ./boot linux-5.15.2
 ```
 
 The argument to the script is the directory under src/ which holds the kernel. Multiple trees
