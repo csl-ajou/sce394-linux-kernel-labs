@@ -5,10 +5,6 @@
 
 set -e
 
-# Variables affected by options
-RELEASE=focal # Ubuntu 20.04
-SEEK=2047
-
 basedir=$(dirname $(readlink -f $0))
 . ${basedir}/config/env.sh
 
@@ -20,7 +16,7 @@ check_availability_of() {
 	fi
 }
 
-# check_availability_of qemu-img
+check_availability_of qemu-img
 check_availability_of /sbin/mkfs.ext4
 check_availability_of sudo
 check_availability_of /usr/sbin/debootstrap
@@ -28,60 +24,48 @@ check_availability_of /usr/sbin/debootstrap
 echo -n "Removing existing ${rootfs}, press ENTER to proceed... "
 read input
 
-# echo -n "Creating rootfs... "
-# qemu-img create ${basedir}/rootfs.img ${rootfs_size} 2>&1 | tee -a ${basedir}/log
-# /sbin/mkfs.ext4 ${basedir}/rootfs.img 2>&1 | tee -a ${basedir}/log
-# 
-# if [ ! -e ${rootfs} ]; then
-#   sudo mkdir ${rootfs}
-# fi
-# 
+echo -n "Creating rootfs... "
+qemu-img create ${basedir}/rootfs.img ${rootfs_size} 2>&1 | tee -a ${basedir}/log
+/sbin/mkfs.ext4 ${basedir}/rootfs.img 2>&1 | tee -a ${basedir}/log
+
+if [ ! -e ${rootfs} ]; then
+	sudo mkdir ${rootfs}
+fi
+
+echo -n "Mounting ${rootfs} on loopback... "
+sudo mount -o loop ${basedir}/rootfs.img ${rootfs}
+echo "ok"
 
 echo -n "Bootstrapping filesystem... "
-sudo /usr/sbin/debootstrap --arch amd64 ${RELEASE} ${rootfs} \
-	http://archive.ubuntu.com/ubuntu 2>&1 | tee -a ${basedir}/log
+sudo /usr/sbin/debootstrap unstable ${rootfs} http://deb.debian.org/debian/ 2>&1 | tee -a ${basedir}/log
 echo "ok"
 
 echo -n "Setting hostname: ${hostname}... "
 sudo sh -c "echo '${hostname}' > ${rootfs}/etc/hostname"
 echo "ok"
 
-############################# referenced by syzkaller project ##########################
+#echo "Set the root password... "
+#sudo sh -c "chroot ${rootfs} passwd root"
+#
+#echo "Enabling networking... "
+#sudo cp ${confdir}/dhcp.network ${rootfs}/etc/systemd/network/
+#sudo sh -c "chroot ${rootfs} systemctl enable systemd-networkd.service"
+#sudo sh -c "chroot ${rootfs} systemctl enable systemd-resolved.service"
+
+# ############################# referenced by syzkaller project ##########################
+echo -n "Setting root as a non-login"
 sudo sed -i '/^root/ { s/:x:/::/ }' ${rootfs}/etc/passwd
-echo 'T0:23:respawn:/sbin/getty -L ttyS0 115200 vt100' | sudo tee -a ${rootfs}/etc/inittab
-echo '/dev/root / ext4 defaults 0 0' | sudo tee -a ${rootfs}/etc/fstab
-echo 'debugfs /sys/kernel/debug debugfs defaults 0 0' | sudo tee -a ${rootfs}/etc/fstab
-echo 'securityfs /sys/kernel/security securityfs defaults 0 0' | sudo tee -a ${rootfs}/etc/fstab
-echo 'configfs /sys/kernel/config/ configfs defaults 0 0' | sudo tee -a ${rootfs}/etc/fstab
-echo "kernel.printk = 7 4 1 3" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo 'debug.exception-trace = 0' | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "net.core.bpf_jit_enable = 1" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "net.core.bpf_jit_kallsyms = 1" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "net.core.bpf_jit_harden = 0" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "kernel.softlockup_all_cpu_backtrace = 1" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "kernel.kptr_restrict = 0" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "kernel.watchdog_thresh = 60" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo "net.ipv4.ping_group_range = 0 65535" | sudo tee -a ${rootfs}/etc/sysctl.conf
-echo -en "127.0.0.1\tlocalhost\n" | sudo tee ${rootfs}/etc/hosts
-echo "nameserver 8.8.8.8" | sudo tee -a ${rootfs}/etc/resolve.conf
-ssh-keygen -f $RELEASE.id_rsa -t rsa -N ''
-sudo mkdir -p ${rootfs}/root/.ssh/
-cat $RELEASE.id_rsa.pub | sudo tee ${rootfs}/root/.ssh/authorized_keys
+echo "\nok"
 
-
-# Build a disk image
-dd if=/dev/zero of=$RELEASE.img bs=1M seek=$SEEK count=1
-sudo mkfs.ext4 -F $RELEASE.img
-if [ ! -e ${rootfs} ]; then
-  sudo mkdir -p ${rootfs}
+if test ! -z "${packages_to_install}"; then
+	echo "Installing additional packages... "
+	sudo sh -c "chroot ${rootfs} apt-get update"
+	sudo sh -c "chroot ${rootfs} apt-get install -y ${packages_to_install}"
 fi
-sudo mount -o loop $RELEASE.img ${basedir}/${rootfs}
-sudo cp -a ${rootfs}/. /mnt/${rootfs}/.
 
 echo -n "Cleaning up... "
 sync
-
+sleep 5
 sudo umount ${rootfs}
 sudo rmdir ${rootfs}
 echo "ok"
-########################################################################################

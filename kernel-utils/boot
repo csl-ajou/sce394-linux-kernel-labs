@@ -128,5 +128,6 @@ fi
 
 ${qemu} -m ${memory} -kernel ${bzImage} ${initrd_args} -nographic \
 	-hda ${basedir}/rootfs.img \
-	-append "${root_device} rw console=ttyS0 earlyprintk=vga nokaslr selinux=0 debug ${append_args}" #\
+	-append "${root_device} rw console=ttyS0 earlyprintk=vga nokaslr selinux=0 debug ${append_args}" \
+	-pidfile vm.pid 2>&1 | tee vm.log
 	# -enable-kvm ${debug_args}
