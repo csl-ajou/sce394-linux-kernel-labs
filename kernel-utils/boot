@@ -12,6 +12,8 @@ basedir=$(dirname $(readlink -f $0))
 
 qemu=qemu-system-${qemu_arch}
 
+pidfile=vm.pid
+
 check_availability_of() {
 	prog=$1
 	if ! command -v ${prog} 2>&1 > /dev/null; then
@@ -23,6 +25,7 @@ check_availability_of() {
 check_availability_of make
 check_availability_of sudo
 check_availability_of $qemu
+
 
 if test ! -d ${srcdir}; then
   echo "Please copy kernel sources into ${srcdir}."
@@ -41,6 +44,13 @@ if test -z "${kernel}"; then
 	                      -type d -exec basename {} \; | grep -v ${srcdir}); do
     [ -e ${srcdir}/${dir}/MAINTAINERS ] && echo $dir
   done
+  exit 1
+fi
+
+if test -e ${pidfile}; then
+  pid=$(sudo cat ${pidfile})
+  echo "Please shutdown the running qemu process. PID:${pid}"
+  echo "Execute ./exit_vm.sh"
   exit 1
 fi
 
@@ -104,9 +114,20 @@ if test "${copy_samples_to_rootfs}x" = "yx"; then
     )
 fi
 
+if test "${copy_labs_to_rootfs}x" = "yx"; then
+    (
+      labs=$(ls ${labdir})
+
+      echo "Copying lab sources to rootfs..."
+      #find ${labdir} -type f \( -name *.ko -or -executable \) | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
+      find ${labdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
+    )
+fi
+
 sync
 sudo umount ${rootfs}
 sudo rmdir ${rootfs}
+
 
 echo "Booting kernel: ${bzImage}"
 
@@ -129,5 +150,7 @@ fi
 ${qemu} -m ${memory} -kernel ${bzImage} ${initrd_args} -nographic \
 	-hda ${basedir}/rootfs.img \
 	-append "${root_device} rw console=ttyS0 earlyprintk=vga nokaslr selinux=0 debug ${append_args}" \
-	-pidfile vm.pid 2>&1 | tee vm.log
+	-pidfile ${pidfile} 2>&1 | tee vm.log
 	# -enable-kvm ${debug_args}
+
+sudo rm ${pidfile}

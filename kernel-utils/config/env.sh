@@ -13,6 +13,7 @@ rootfs=${basedir}/rootfs
 depsdir=${basedir}/deps
 samplesdir=${basedir}/samples
 busyboxdir=${depsdir}/busybox
+labdir=labs
 
 hostname=sce394_vm
 rootfs_size=4096m
@@ -21,6 +22,9 @@ memory=512m
 # Option to compile and copy kernel modules to rootfs
 copy_modules_to_rootfs=y
 copy_samples_to_rootfs=y
+
+# Option to compile and copy lab sources to rootfs
+copy_labs_to_rootfs=y
 
 debootstrap_arch=amd64
 qemu_arch=x86_64
