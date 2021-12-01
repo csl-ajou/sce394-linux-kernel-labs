@@ -1,0 +1,10 @@
+The IT intensive course.
+Linux kenrel programming practices
+
+Skeleton developed by UPB, modified for Ajou Univ. SCE394
+==================================
+
+There are some tools for constructing linux kernel developing environment such
+as create images scripts, boot kernel on qemu script.
+
+In kernel_utils/labs, there are practice codes for this course.
