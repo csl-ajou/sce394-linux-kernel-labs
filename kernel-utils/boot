@@ -87,7 +87,7 @@ echo "Mounting ${rootfs} on loopback... "
 if [ ! -e ${rootfs} ]; then
   sudo mkdir ${rootfs}
 fi
-sudo mount -o loop ${basedir}/rootfs.img ${rootfs}
+sudo mount -o loop ${rootimg} ${rootfs}
 
 if test -e ${vmlinux}; then
   sudo cp ${vmlinux} ${rootfs}/
@@ -119,8 +119,7 @@ if test "${copy_labs_to_rootfs}x" = "yx"; then
       labs=$(ls ${labdir})
 
       echo "Copying lab sources to rootfs..."
-      #find ${labdir} -type f \( -name *.ko -or -executable \) | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
-      find ${labdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
+      find ${labdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/home/root || true
     )
 fi
 
@@ -147,10 +146,19 @@ else
   append_args="init=/lib/systemd/systemd"
 fi
 
-${qemu} -m ${memory} -kernel ${bzImage} ${initrd_args} -nographic \
-	-hda ${basedir}/rootfs.img \
-	-append "${root_device} rw console=ttyS0 earlyprintk=vga nokaslr selinux=0 debug ${append_args}" \
-	-pidfile ${pidfile} 2>&1 | tee vm.log
-	# -enable-kvm ${debug_args}
+# ${qemu} -m ${memory} -kernel ${bzImage} ${initrd_args} -nographic \
+# 	-hda ${basedir}/${rootimg} \
+# 	-append "${root_device} rw console=ttyS0 earlyprintk=vga nokaslr selinux=0 debug ${append_args}" \
+# 	-pidfile ${pidfile} 2>&1 | tee vm.log
+# 	# -enable-kvm ${debug_args}
+sudo qemu-system-x86_64 \
+        -kernel ${bzImage} \
+        -append "rw console=ttyS0,115200 root=/dev/sda" \
+        -drive file=${rootimg} \
+        -nographic \
+        -m ${memory} \
+        -pidfile vm.pid -s \
+        2>&1 | tee vm.log
+#-hda ${basedir}/${rootimg} \
 
 sudo rm ${pidfile}
