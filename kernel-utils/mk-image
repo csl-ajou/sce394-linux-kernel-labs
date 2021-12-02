@@ -38,15 +38,5 @@ else
 fi
 echo "ok"
 
-# add more vty
-echo -n "Adding more vty... "
-sudo sh -c "cat >> $TMP/etc/inittab <<EOF
-2:12345:respawn:/sbin/getty 38400 tty2
-3:12345:respawn:/sbin/getty 38400 tty3
-4:12345:respawn:/sbin/getty 38400 tty4
-5:12345:respawn:/sbin/getty 38400 tty5
-EOF"
-echo "ok"
-
 sudo umount $TMP
 rmdir $TMP
