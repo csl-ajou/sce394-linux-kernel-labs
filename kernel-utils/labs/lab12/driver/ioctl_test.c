@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 
 	} else if (pid == 0) {
 		ioctl(fd, MY_IOCTL_INT, NULL);
-		// /* expected answer is -5 */
+		// /* expected answer is -15 */
 		ioctl(fd, MY_IOCTL_RESET, NULL);
 
 		ioctl(fd, MY_IOCTL_INC_0, NULL);
