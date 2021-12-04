@@ -169,7 +169,7 @@ static ssize_t my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) 
 			my_data->num[2] = 0;
 			my_data->num[3] = 0;
 			my_data->num[4] = 0;
-			sum = 0;
+			my_data->sum = 0;
 			break;
 		default:
 			ret = -EINVAL;
