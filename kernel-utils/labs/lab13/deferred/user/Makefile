@@ -1,5 +1,5 @@
-CFLAGS=-Wall -m32
-LDFLAGS=-static -m32
+CFLAGS=-Wall
+LDFLAGS=-static
 
 test: test.o
 
