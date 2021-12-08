@@ -165,9 +165,9 @@ static int mymmap_init(void)
 	dev.size = MAX_PAGES * PAGE_SIZE;
 #else
 	pr_info("You must to build with arguments"
-		        " ALLOC=USE_KMALLOC"
-			" or ALLOC=USE_VMALLOC"
-			" or ALLOC=USE_ALLOC_PAGES\n");
+		        " ALLOC=-DUSE_KMALLOC"
+			" or ALLOC=-DUSE_VMALLOC"
+			" or ALLOC=-DUSE_ALLOC_PAGES\n");
 	dev.size = 0;
 #endif
 
