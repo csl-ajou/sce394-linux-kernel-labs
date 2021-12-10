@@ -6,10 +6,10 @@ ARCH="x86-64"
 
 YOCTO_URL="http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu${ARCH}/"
 #YOCTO_IMAGE="core-image-minimal-qemu${ARCH}.ext4"
-YOCTO_IMAGE="core-image-minimal-dev-qemu${ARCH}.ext4"
+#YOCTO_IMAGE="core-image-minimal-dev-qemu${ARCH}.ext4"
 #YOCTO_IMAGE="core-image-sato-dev-qemu${ARCH}.ext4"
 #YOCTO_IMAGE="core-image-sato-qemu${ARCH}.ext4"
-#YOCTO_IMAGE="core-image-sato-sdk-qemu${ARCH}.ext4"
+YOCTO_IMAGE="core-image-sato-sdk-qemu${ARCH}.ext4"
 
 # Number of processor threads
 procs=$(nproc)
@@ -25,6 +25,7 @@ depsdir=${basedir}/deps
 samplesdir=${basedir}/samples
 busyboxdir=${depsdir}/busybox
 labdir=labs
+projdir=project
 
 hostname=sce394_vm
 rootfs_size=1024m
@@ -36,6 +37,7 @@ copy_samples_to_rootfs=y
 
 # Option to compile and copy lab sources to rootfs
 copy_labs_to_rootfs=y
+copy_proj_to_rootfs=y
 
 debootstrap_arch=amd64
 qemu_arch=x86_64

@@ -123,6 +123,15 @@ if test "${copy_labs_to_rootfs}x" = "yx"; then
     )
 fi
 
+if test "${copy_proj_to_rootfs}x" = "yx"; then
+    (
+      labs=$(ls ${projdir})
+
+      echo "Copying project sources to rootfs..."
+      find ${projdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/home/root || true
+    )
+fi
+
 sync
 sudo umount ${rootfs}
 sudo rmdir ${rootfs}

@@ -13,12 +13,12 @@ if [ -e ${YOCTO_IMAGE} ]; then
 fi
 
 wget "${YOCTO_URL}/${YOCTO_IMAGE}"
-sudo ARCH=${ARCH} qemu/prepare-image.sh ${YOCTO_IMAGE}
 
 size=$(stat -c%s ${YOCTO_IMAGE})
-if [ $size -lt 50000000 ]; then
+if [ $size -lt 4000000000 ]; then
 	e2fsck -f ${YOCTO_IMAGE}
-	resize2fs ${YOCTO_IMAGE} 1G
+	resize2fs ${YOCTO_IMAGE} 4G
+	echo "IMAGE size(storage) is grown to 4GB"
 fi
 
 TMP=$(mktemp -d)
