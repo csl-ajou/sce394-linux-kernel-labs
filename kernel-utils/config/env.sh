@@ -20,7 +20,7 @@ confdir=${basedir}/config
 initrd=${basedir}/initrd
 srcdir=${basedir}/src
 rootfs=${basedir}/rootfs
-rootimg=${basedir}/${img}
+rootimg=${basedir}/rootfs.img
 depsdir=${basedir}/deps
 samplesdir=${basedir}/samples
 busyboxdir=${depsdir}/busybox
@@ -28,7 +28,7 @@ labdir=labs
 projdir=project
 
 hostname=sce394_vm
-rootfs_size=1024m
+rootfs_size=2048m
 memory=512m
 
 # Option to compile and copy kernel modules to rootfs
