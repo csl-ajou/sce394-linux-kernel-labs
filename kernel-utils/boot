@@ -119,7 +119,7 @@ if test "${copy_labs_to_rootfs}x" = "yx"; then
       labs=$(ls ${labdir})
 
       echo "Copying lab sources to rootfs..."
-      find ${labdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/home/root || true
+      find ${labdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
     )
 fi
 
@@ -128,7 +128,7 @@ if test "${copy_proj_to_rootfs}x" = "yx"; then
       labs=$(ls ${projdir})
 
       echo "Copying project sources to rootfs..."
-      find ${projdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/home/root || true
+      find ${projdir} -type f | xargs --no-run-if-empty sudo cp --parents -t ${rootfs}/root || true
     )
 fi
 
