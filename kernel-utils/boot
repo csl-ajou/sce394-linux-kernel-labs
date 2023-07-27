@@ -96,14 +96,6 @@ fi
 echo "Removing existing kernel modules..."
 sudo rm -rf ${rootfs}/lib/modules/*
 
-if test "${copy_modules_to_rootfs}x" = "yx"; then
-    (
-      cd ${srcdir}/${kernel}
-      echo "Copying kernel modules to rootfs..."
-      sudo make INSTALL_MOD_PATH=${rootfs} modules_install
-    )
-fi
-
 if test "${copy_samples_to_rootfs}x" = "yx"; then
     (
       cd ${samplesdir}
@@ -111,6 +103,18 @@ if test "${copy_samples_to_rootfs}x" = "yx"; then
 
       echo "Copying sample kernel modules to rootfs..."
       sudo KERNEL_PATH=${srcdir}/${kernel} INSTALL_MOD_PATH=${rootfs} make install
+    )
+fi
+
+if test "${copy_modules_to_rootfs}x" = "yx"; then
+    (
+      #cd ${srcdir}/${kernel}
+      #echo "Copying kernel modules to rootfs..."
+      #sudo make INSTALL_MOD_PATH=${rootfs} modules_install
+      sudo apt-get -y install rsync
+      sudo rsync -av --exclude='cscope*' --exclude='tags' --exclude='vmlinux*' ${srcdir}/${kernel} ${rootfs}/usr/src/
+      echo "Install kernel modules to rootfs..."
+      sudo chroot ${rootfs} make -C /usr/src/${kernel}/ modules_install
     )
 fi
 

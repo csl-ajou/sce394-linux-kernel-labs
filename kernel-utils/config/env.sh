@@ -28,7 +28,7 @@ labdir=labs
 projdir=project
 
 hostname=sce394_vm
-rootfs_size=2048m
+rootfs_size=4608m
 memory=512m
 
 # Option to compile and copy kernel modules to rootfs
