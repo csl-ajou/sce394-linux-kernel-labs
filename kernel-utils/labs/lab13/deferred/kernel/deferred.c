@@ -80,12 +80,17 @@ static struct mon_proc *get_proc(pid_t pid)
 
 static void timer_handler(struct timer_list *tl)
 {
+	/*print a message(printk or pr_info)
+ 		//You can find the current process identifier using the pid and comm fields of the current process.
+   
 	/* TODO 1: implement timer handler */
-	/* TODO 2: check flags: TIMER_TYPE_SET or TIMER_TYPE_ALLOC */
+	/* TODO 2: check flags: TIMER_TYPE_ALLOC or TIMER_TYPE_MON */
 		/* TODO 3: schedule work */
 		/* TODO 4: iterate the list and check the proccess state */
 			/* TODO 4: if task is dead print info ... */
+				//Use the state field of struct task_struct(). A task has terminated if its state is TASK_DEAD.
 			/* TODO 4: ... decrement task usage counter ... */
+				/*Use put_task_struct() to decrement the task usage counter.*/
 			/* TODO 4: ... remove it from the list ... */
 			/* TODO 4: ... free the struct mon_proc */
 }
@@ -155,6 +160,7 @@ static int deferred_init(void)
 	}
 
 	/* TODO 2: Initialize flag. */
+		// For initialization, use TIMER_TYPE_NONE.
 	/* TODO 3: Initialize work. */
 
 	/* TODO 4: Initialize lock and list. */
@@ -181,6 +187,7 @@ static void deferred_exit(void)
 
 	/* TODO 4: Cleanup the monitered process list */
 		/* TODO 4: ... decrement task usage counter ... */
+			/*Use put_task_struct() to decrement the task usage counter.*/
 		/* TODO 4: ... remove it from the list ... */
 		/* TODO 4: ... free the struct mon_proc */
 }
